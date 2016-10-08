@@ -32,7 +32,7 @@ class API:
 
         self.service_workers_list = ServiceWorkersList.get_workers(ServiceWorkersList
                                                                    , cfg["included_service_workers"], self)
-        self.INACT_M = cfg["user_inactivity_time_at_minutes"]
+        self.INACT_M = int(cfg["user_inactivity_time_at_minutes"])
 
     def get(self, toffset=0):
         return self.telegram.get(toffset)
