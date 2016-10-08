@@ -47,8 +47,7 @@ class Autoquit(BaseWorker):
     old_time = datetime.datetime.utcnow()
 
     def is_it_for_me(self):
-        return self.tAPI.DB_IS_ENABLED \
-               and datetime.datetime.utcnow() - datetime.timedelta(minutes=self.tAPI.INACT_M) >= self.old_time
+        return datetime.datetime.utcnow() - datetime.timedelta(minutes=self.tAPI.INACT_M) >= self.old_time
 
     def run(self):
         self.old_time = datetime.datetime.utcnow()
