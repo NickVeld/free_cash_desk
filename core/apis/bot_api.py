@@ -3,6 +3,7 @@
 import requests
 import json
 from core.workers.service_workers import WorkersList as ServiceWorkersList
+from core.services.gspread_shell import GShell
 
 import datetime
 
@@ -10,7 +11,7 @@ import datetime
 class API:
     def __init__(self):
         self.telegram = Tg_api()
-        self.additional = Additional()
+        self.gshell = GShell()
         self.offset = 0
 
         self.admin_ids = list()
@@ -27,7 +28,7 @@ class API:
         self.BOT_NICK = cfg['APIs']['bot_nick']
 
         self.telegram.get_from_config(cfg['APIs'])
-        self.additional.get_from_config(cfg['APIs'])
+        self.gshell.get_from_config(cfg['APIs'])
 
         self.service_workers_list = ServiceWorkersList.get_workers(ServiceWorkersList
                                                                    , cfg["included_service_workers"], self)

@@ -102,18 +102,29 @@ class Humanity(BaseWorker):
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
         pass
 
-#TODO: Rename, channge the command and the hel info.
-class Example(BaseWorker):
-    COMMAND = "/example"
-    HELP = COMMAND + " - пример комнды\n\n"
+class StatusChanger(BaseWorker):
+    COMMAND = "/changeto"
+    HELP = COMMAND + "_0/1/2_info at the first string_info at the second string\n" \
+                     "0 - busy/out, 1 - short time, 2 - ready and wait\n\n"
 
-    waitlist = dict()
+    waitlist = set()
 
     def is_it_for_me(self, tmsg):
-        return tmsg.text.startswith(self.COMMAND) or tmsg.is_inline
+        return tmsg.text.startswith(self.COMMAND) or (tmsg.pers_id, tmsg.chat_id) in self.waitlist
 
     def run(self, tmsg):
-        #TODO: Add the logic of message processing
+        if (tmsg.pers_id == tmsg.chat_id):
+            self.tAPI.mark_activity(tmsg.pers_id)
+        if not ((tmsg.pers_id, tmsg.chat_id) in self.waitlist):
+            if (tmsg.text == self.COMMAND):
+                self.waitlist.add((tmsg.pers_id, tmsg.chat_id))
+                self.tAPI.send("Введите данные в формате, описанном в /help.")
+                return 0
+            else:
+                tmsg.text_change_to(tmsg.text[len(self.COMMAND):])
+
+        self.tAPI.gshell.send("ОиМП (1 курс)", 5, 2, tmsg.text.split("_"))
+        self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
         return 0
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
