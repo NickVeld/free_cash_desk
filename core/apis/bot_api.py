@@ -4,9 +4,7 @@ import requests
 import json
 from core.workers.service_workers import WorkersList as ServiceWorkersList
 
-from telegram.ext import Updater
-
-__author__ = 'NickVeld'
+import datetime
 
 
 class API:
@@ -20,14 +18,8 @@ class API:
 
         self.workers_list = None
 
-    # def __init__(self, data):
-    #     self.telegram = Tg_api(data["api_key"])
-    #     self.translator = Translator(data["dict_key"], data["tr_key"])
-    #
-    #     self.admin_ids = data["admin_ids"]
-    #     self.DB_IS_ENABLED = data["db_is_enabled"]
-    #     self.NO_CARDS_GROUPS = not data["cards_groups"]
-    #     self.db = MongoClient(data["mongo_name"], data["mongo_port"])["e_card"] if self.DB_IS_ENABLED else None
+        self.users_and_activity = dict()
+        self.INACT_M = 5
 
     def get_from_config(self, cfg):
         self.admin_ids = list(cfg['admins_ids'])
@@ -39,6 +31,7 @@ class API:
 
         self.service_workers_list = ServiceWorkersList.get_workers(ServiceWorkersList
                                                                    , cfg["included_service_workers"], self)
+        self.INACT_M = cfg["user_inactivity_time_at_minutes"]
 
     def get(self, toffset=0):
         return self.telegram.get(toffset)
@@ -77,6 +70,16 @@ class API:
 
     def get_inline_text_keyboard(self, source):
         return self.telegram.get_inline_text_keyboard(source)
+
+    def get_ready_for_autoquit(self):
+        candidates = list()
+        for user, time in self.users_and_activity.items():
+            if datetime.datetime.utcnow() - datetime.timedelta(minutes=(self.INACT_M)) < time:
+                candidates.append(user)
+        return candidates
+
+    def mark_activity(self, pers_id):
+        self.users_and_activity[pers_id] = datetime.datetime.utcnow()
 
 
 class Tg_api:

@@ -1,8 +1,7 @@
 import sys
 import datetime
-# from multiprocessing import Process
+from multiprocessing import Process
 from core.engine.autoquit import autoquit_run
-# from core.engine.reminder import reminder_run
 
 
 class WorkersList(type):
@@ -53,7 +52,7 @@ class Autoquit(BaseWorker):
 
     def run(self):
         self.old_time = datetime.datetime.utcnow()
-        # autoquit = Process(target=autoquit_run, args=(self.tAPI,))
-        # autoquit.start()
-        autoquit_run(self.tAPI)
+        autoquit = Process(target=autoquit_run, args=(self.tAPI,))
+        autoquit.start()
+        # autoquit_run(self.tAPI)
         return 1

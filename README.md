@@ -1,4 +1,2 @@
-# BotTemplate
-It is a template for telegram bots.
-
-Just duplicate the repository, read TODOs and write.
+# Free cash desk
+The telegram bot for controlling the table of the edu assistants.
