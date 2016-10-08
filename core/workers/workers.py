@@ -124,8 +124,10 @@ class Info(BaseWorker):
 
 class StatusChanger(BaseWorker):
     COMMAND = "/changeto"
-    HELP = COMMAND + "_0/1/2_info at the first string_info at the second string\n" \
-                     "0 - busy/out, 1 - short time, 2 - ready and wait\n\n"
+    HELP = COMMAND + "_*empty*/0/1/2/_info at the first string_info at the second string\n" \
+                     "0 - busy/out, 1 - short time, 2 - ready and wait\n" \
+                     "Examples: " + COMMAND + "___ - to start state (A is busy/away)\n"\
+                    + COMMAND + "_2_310_18:00 (A is ready and sit at 310 to 18:00" "\n\n"
 
     waitlist = set()
 
@@ -141,7 +143,7 @@ class StatusChanger(BaseWorker):
                 self.tAPI.send("Введите данные в формате, описанном в /help.", tmsg.chat_id, tmsg.id)
                 return 0
             else:
-                tmsg.text_change_to(tmsg.text[len(self.COMMAND):])
+                tmsg.text_change_to(tmsg.text[len(self.COMMAND) + 1:])
 
         self.tAPI.gshell.send("ОиМП (1 курс)", 4, 2, [tmsg.text.split("_")])
         self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
@@ -153,3 +155,20 @@ class StatusChanger(BaseWorker):
             self.waitlist.remove((pers_id, chat_id))
             if additional_info != '':
                 self.tAPI.send_inline_keyboard(additional_info, chat_id, self.MENU_KEYBOARD, msg_id)
+
+
+class TgID(BaseWorker):
+    COMMAND = "/myid"
+    HELP = COMMAND + "- get own telegram id\n" \
+                     "The assisant would send the result for the auth setup.\n\n"
+
+    def is_it_for_me(self, tmsg):
+        return tmsg.text.startswith(self.COMMAND)
+
+    def run(self, tmsg):
+        print(str(tmsg.pers_id) + " " + tmsg.name + " " + tmsg.surname)
+        self.tAPI.send(str(tmsg.pers_id), tmsg.chat_id, tmsg.id)
+        return 0
+
+    def quit(self, pers_id, chat_id, additional_info='', msg_id=0):
+        pass
