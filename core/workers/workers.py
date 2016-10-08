@@ -91,17 +91,18 @@ class Humanity(BaseWorker):
 
     def run(self, tmsg):
         tmsg.text_change_to(tmsg.text.lower())
+        #TODO: Add your own commands
         if self.re.match(r"^(((\/| )*)команды)", tmsg.text):
-            self.tAPI.send("Список фраз:\n\"Пример\" - пример команды."
+            self.tAPI.send("Список фраз:\n\"Example\" или \"Пример\" - пример команды."
                            , tmsg.chat_id, tmsg.id)
             return 0
-        tmsg.text_replace(r"^(((\/| )*)(пример))", Example.COMMAND, self.re.sub)
+        tmsg.text_replace(r"^(((\/| )*)(example|пример))", Example.COMMAND, self.re.sub)
         return 1
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
         pass
 
-
+#TODO: Rename, channge the command and the hel info.
 class Example(BaseWorker):
     COMMAND = "/example"
     HELP = COMMAND + " - пример комнды\n\n"
@@ -112,9 +113,11 @@ class Example(BaseWorker):
         return tmsg.text.startswith(self.COMMAND) or tmsg.is_inline
 
     def run(self, tmsg):
+        #TODO: Add the logic of message processing
         return 0
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
+        #TODO: Feel free to change
         if (pers_id, chat_id) in self.waitlist:
             self.waitlist.pop((pers_id, chat_id))
             if additional_info != '':

@@ -263,6 +263,7 @@ class Tg_api:
             print(type(ex), ex.__str__())
         return message
 
+#TODO: Use it if you need more APIs
 class Additional:
     def __init__(self):
         pass
