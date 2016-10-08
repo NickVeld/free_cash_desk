@@ -93,14 +93,34 @@ class Humanity(BaseWorker):
         tmsg.text_change_to(tmsg.text.lower())
         #TODO: Add your own commands
         if self.re.match(r"^(((\/| )*)команды)", tmsg.text):
-            self.tAPI.send("Список фраз:\n\"Example\" или \"Пример\" - пример команды."
+            self.tAPI.send("Список фраз:\n\"Поменять на\" или \"Change to\" - аналогично " + StatusChanger.COMMAND
                            , tmsg.chat_id, tmsg.id)
             return 0
-        tmsg.text_replace(r"^(((\/| )*)(example|пример))", Example.COMMAND, self.re.sub)
+        tmsg.text_replace(r"^(((\/| )*)(change*to|поменять*на))", StatusChanger.COMMAND, self.re.sub)
         return 1
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
         pass
+
+
+class Info(BaseWorker):
+    COMMAND = "/help"
+
+    def is_it_for_me(self, tmsg):
+        return tmsg.text.startswith(self.COMMAND) or tmsg.text.startswith("/start")
+
+    def run(self, tmsg):
+        HELP = ""
+
+        for worker in WorkersList.workers:
+            HELP += worker[1].HELP
+        HELP = HELP[:-2]
+        self.tAPI.send_inline_keyboard(HELP, tmsg.chat_id, self.MENU_KEYBOARD)
+        return 0
+
+    def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
+        pass
+
 
 class StatusChanger(BaseWorker):
     COMMAND = "/changeto"
@@ -118,38 +138,18 @@ class StatusChanger(BaseWorker):
         if not ((tmsg.pers_id, tmsg.chat_id) in self.waitlist):
             if (tmsg.text == self.COMMAND):
                 self.waitlist.add((tmsg.pers_id, tmsg.chat_id))
-                self.tAPI.send("Введите данные в формате, описанном в /help.")
+                self.tAPI.send("Введите данные в формате, описанном в /help.", tmsg.chat_id, tmsg.id)
                 return 0
             else:
                 tmsg.text_change_to(tmsg.text[len(self.COMMAND):])
 
-        self.tAPI.gshell.send("ОиМП (1 курс)", 5, 2, tmsg.text.split("_"))
+        self.tAPI.gshell.send("ОиМП (1 курс)", 4, 2, [tmsg.text.split("_")])
         self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
         return 0
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
         #TODO: Feel free to change
         if (pers_id, chat_id) in self.waitlist:
-            self.waitlist.pop((pers_id, chat_id))
+            self.waitlist.remove((pers_id, chat_id))
             if additional_info != '':
                 self.tAPI.send_inline_keyboard(additional_info, chat_id, self.MENU_KEYBOARD, msg_id)
-
-
-class Info(BaseWorker):
-    COMMAND = "/help"
-
-    def is_it_for_me(self, tmsg):
-        return tmsg.text.startswith(self.COMMAND) or tmsg.text.startswith("/start")
-
-    def run(self, tmsg):
-        HELP = ""
-            # "Включен режим презентации, Вы можете получить слова из банка." if self.tAPI.db_shell.TEST_WORDS else ""
-            # "Storage is " + ("on" if self.tAPI.DB_IS_ENABLED else "off") + "!\n\n"
-        for worker in WorkersList.workers:
-            HELP += worker[1].HELP
-        HELP = HELP[:-2]
-        self.tAPI.send_inline_keyboard(HELP, tmsg.chat_id, self.MENU_KEYBOARD)
-        return 0
-
-    def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
-        pass
