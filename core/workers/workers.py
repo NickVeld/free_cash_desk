@@ -131,7 +131,7 @@ class StatusChanger(BaseWorker):
 
     waitlist = set()
 
-    a_map = {61407283: ["ОиМП (1 курс)", 4, 2], 1374125 : ["МА (1 курс)", 4, 7]}
+    from assistants_map import a_map
 
     def is_it_for_me(self, tmsg):
         return tmsg.text.startswith(self.COMMAND) or (tmsg.pers_id, tmsg.chat_id) in self.waitlist
