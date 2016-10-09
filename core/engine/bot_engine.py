@@ -14,6 +14,8 @@ class BotCycle:
 
         try:
             for msg in self.tapi.get_msg():
+                if 'edited_message' in msg:
+                    continue
                 tmsg = Msg(msg, self.tapi.BOT_NICK)
                 if (tmsg.msg == None) or tmsg.text.startswith("//"):
                     continue
