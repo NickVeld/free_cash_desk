@@ -11,8 +11,8 @@ class GShell:
         credentials = ServiceAccountCredentials.from_json_keyfile_name("FreeCashDesk.json", scope)
         self.ssheet = gspread.authorize(credentials).open_by_key(config["gspread_key"])
 
-    def send(self, sheet_name, row, column, info):
-        sheet = self.ssheet.worksheet(sheet_name)
-        for col in range(len(info)):
-            for r in range(min(3, len(info[col]))):
-                sheet.update_cell(row + r, column + col, info[col][r])
+    def send(self, address, info):
+        sheet = self.ssheet.worksheet(address[0])
+        for column in range(len(info)):
+            for row in range(min(3, len(info[column]))):
+                sheet.update_cell(row + address[1], column + address[2], info[column][row])
