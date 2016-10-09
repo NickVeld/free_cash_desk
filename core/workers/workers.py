@@ -40,7 +40,15 @@ class BaseWorker(object, metaclass=WorkersList):
     
     def __init__(self, teleapi):
         self.tAPI = teleapi
-        self.MENU_KEYBOARD = []
+        self.MENU_KEYBOARD = [
+            [{'text': "Поменять на", 'callback_data': StatusChanger.COMMAND}
+                , {'text': "Я ассистент и готов к приему", 'callback_data': StatusChanger.COMMAND + "_2__"}],
+            [{'text': "Показать табличку", 'callback_data': GetTable.COMMAND}
+                , {'text': "Я ассистент и я могу быстро", 'callback_data': StatusChanger.COMMAND + '_1__'}],
+            [{'text': "Показать мой id в telegram", 'callback_data': TgID.COMMAND}
+                , {'text': "Я ассистент и я не могу", 'callback_data': StatusChanger.COMMAND + '_0__'}],
+            [{'text': "HELP!!!1!", 'callback_data': Info.COMMAND}]
+        ]
 
 
 
@@ -143,25 +151,47 @@ class StatusChanger(BaseWorker):
             if not ((tmsg.pers_id, tmsg.chat_id) in self.waitlist):
                 if (tmsg.text == self.COMMAND):
                     self.waitlist.add((tmsg.pers_id, tmsg.chat_id))
-                    self.tAPI.send("Введите данные в формате:\n"
-                                   "*empty*/0/1/2/_info at the first string_info at the second string", tmsg.chat_id, tmsg.id)
+                    if tmsg.is_inline:
+                        self.tAPI.edit("Введите данные в формате:\n"
+                                       "*empty*/0/1/2/_info at the first string_info at the second string"
+                                       , tmsg.chat_id, [], tmsg.id)
+                    else:
+                        self.tAPI.send("Введите данные в формате:\n"
+                                   "*empty*/0/1/2/_info at the first string_info at the second string"
+                                       , tmsg.chat_id, tmsg.id)
                     return 0
                 else:
                     tmsg.text_change_to(tmsg.text[len(self.COMMAND) + 1:])
 
             self.tAPI.gshell.send(self.a_map[tmsg.pers_id], [tmsg.text.split("_")])
-            self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
+            self.quit(tmsg.pers_id, tmsg.chat_id, "Done! Your status: " + tmsg.text[0], tmsg.id, True)
         else:
             self.tAPI.send("Вы не зарегистрированы, как ассистент 1-го курса. :(", tmsg.chat_id, tmsg.id)
         return 0
 
-    def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
+    def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0, forcemsg = False):
         #TODO: Feel free to change
         if (pers_id, chat_id) in self.waitlist:
             self.waitlist.remove((pers_id, chat_id))
             if additional_info != '':
                 self.tAPI.send_inline_keyboard(additional_info, chat_id, self.MENU_KEYBOARD, msg_id)
+        else:
+            if forcemsg and additional_info != '':
+                self.tAPI.edit(additional_info, chat_id, self.MENU_KEYBOARD, msg_id)
 
+class GetTable(BaseWorker):
+    COMMAND = "/gettable"
+    HELP = COMMAND + "- get the table \"СВОБОДНАЯ КАССА\"\n\n"
+
+    def is_it_for_me(self, tmsg):
+        return tmsg.text.startswith(self.COMMAND)
+
+    def run(self, tmsg):
+        self.tAPI.send(self.tAPI.gshell.get_table(), tmsg.chat_id, tmsg.id)
+        return 0
+
+    def quit(self, pers_id, chat_id, additional_info='', msg_id=0):
+        pass
 
 class TgID(BaseWorker):
     COMMAND = "/myid"
