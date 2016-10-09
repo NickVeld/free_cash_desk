@@ -143,7 +143,8 @@ class StatusChanger(BaseWorker):
             if not ((tmsg.pers_id, tmsg.chat_id) in self.waitlist):
                 if (tmsg.text == self.COMMAND):
                     self.waitlist.add((tmsg.pers_id, tmsg.chat_id))
-                    self.tAPI.send("Введите данные в формате, описанном в /help.", tmsg.chat_id, tmsg.id)
+                    self.tAPI.send("Введите данные в формате:\n"
+                                   "*empty*/0/1/2/_info at the first string_info at the second string", tmsg.chat_id, tmsg.id)
                     return 0
                 else:
                     tmsg.text_change_to(tmsg.text[len(self.COMMAND) + 1:])
@@ -151,7 +152,7 @@ class StatusChanger(BaseWorker):
             self.tAPI.gshell.send(self.a_map[tmsg.pers_id], [tmsg.text.split("_")])
             self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
         else:
-            self.tAPI.send("Вы не зарегистрированы, как ассистент 1-го курса. :(")
+            self.tAPI.send("Вы не зарегистрированы, как ассистент 1-го курса. :(", tmsg.chat_id, tmsg.id)
         return 0
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
