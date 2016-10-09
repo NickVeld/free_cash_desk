@@ -123,7 +123,10 @@ class Info(BaseWorker):
         for worker in WorkersList.workers:
             HELP += worker[1].HELP
         HELP = HELP[:-2]
-        self.tAPI.send_inline_keyboard(HELP, tmsg.chat_id, self.MENU_KEYBOARD)
+        if(tmsg.is_inline):
+            self.tAPI.edit(HELP, tmsg.chat_id, self.MENU_KEYBOARD, tmsg.id)
+        else:
+            self.tAPI.send_inline_keyboard(HELP, tmsg.chat_id, self.MENU_KEYBOARD)
         return 0
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
@@ -187,7 +190,10 @@ class GetTable(BaseWorker):
         return tmsg.text.startswith(self.COMMAND)
 
     def run(self, tmsg):
-        self.tAPI.send(self.tAPI.gshell.get_table(), tmsg.chat_id, tmsg.id)
+        if tmsg.is_inline:
+            self.tAPI.edit(self.tAPI.gshell.get_table(), tmsg.chat_id, self.MENU_KEYBOARD, tmsg.id)
+        else:
+            self.tAPI.send_inline_keyboard(self.tAPI.gshell.get_table(), tmsg.chat_id, self.MENU_KEYBOARD, tmsg.id)
         return 0
 
     def quit(self, pers_id, chat_id, additional_info='', msg_id=0):
@@ -203,7 +209,10 @@ class TgID(BaseWorker):
 
     def run(self, tmsg):
         print(str(tmsg.pers_id) + " " + tmsg.name + " " + tmsg.surname)
-        self.tAPI.send(str(tmsg.pers_id), tmsg.chat_id, tmsg.id)
+        if tmsg.is_inline:
+            self.tAPI.edit(str(tmsg.pers_id), tmsg.chat_id, self.MENU_KEYBOARD, tmsg.id)
+        else:
+            self.tAPI.send_inline_keyboard(str(tmsg.pers_id), tmsg.chat_id, self.MENU_KEYBOARD, tmsg.id)
         return 0
 
     def quit(self, pers_id, chat_id, additional_info='', msg_id=0):
