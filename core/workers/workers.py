@@ -131,22 +131,27 @@ class StatusChanger(BaseWorker):
 
     waitlist = set()
 
+    a_map = {61407283: ["ОиМП (1 курс)", 4, 2], 1374125 : ["МА (1 курс)", 4, 7]}
+
     def is_it_for_me(self, tmsg):
         return tmsg.text.startswith(self.COMMAND) or (tmsg.pers_id, tmsg.chat_id) in self.waitlist
 
     def run(self, tmsg):
-        if (tmsg.pers_id == tmsg.chat_id):
-            self.tAPI.mark_activity(tmsg.pers_id)
-        if not ((tmsg.pers_id, tmsg.chat_id) in self.waitlist):
-            if (tmsg.text == self.COMMAND):
-                self.waitlist.add((tmsg.pers_id, tmsg.chat_id))
-                self.tAPI.send("Введите данные в формате, описанном в /help.", tmsg.chat_id, tmsg.id)
-                return 0
-            else:
-                tmsg.text_change_to(tmsg.text[len(self.COMMAND) + 1:])
+        if tmsg.pers_id in self.a_map:
+            if (tmsg.pers_id == tmsg.chat_id):
+                self.tAPI.mark_activity(tmsg.pers_id)
+            if not ((tmsg.pers_id, tmsg.chat_id) in self.waitlist):
+                if (tmsg.text == self.COMMAND):
+                    self.waitlist.add((tmsg.pers_id, tmsg.chat_id))
+                    self.tAPI.send("Введите данные в формате, описанном в /help.", tmsg.chat_id, tmsg.id)
+                    return 0
+                else:
+                    tmsg.text_change_to(tmsg.text[len(self.COMMAND) + 1:])
 
-        self.tAPI.gshell.send("ОиМП (1 курс)", 4, 2, [tmsg.text.split("_")])
-        self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
+            self.tAPI.gshell.send(self.a_map[tmsg.pers_id], [tmsg.text.split("_")])
+            self.quit(tmsg.pers_id, tmsg.chat_id, "Done!", tmsg.id)
+        else:
+            self.tAPI.send("Вы не зарегистрированы, как ассистент 1-го курса. :(")
         return 0
 
     def quit(self, pers_id, chat_id, additional_info = '', msg_id = 0):
