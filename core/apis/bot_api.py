@@ -162,7 +162,7 @@ class Tg_api:
         method = 'sendMessage'
         params = {
             'chat_id': chat_id,
-            'disable_web_page_preview': True,
+            'disable_web_page_preview': False,
             'text': message
         }
         if reply_to_message_id:
@@ -203,7 +203,7 @@ class Tg_api:
         params = {'chat_id': chat_id}
         if (image_url == ""):
             method = 'sendMessage'
-            params['disable_web_page_preview'] = True
+            params['disable_web_page_preview'] = False
             params['text'] = message
         else:
             method = 'sendPhoto'
@@ -242,7 +242,7 @@ class Tg_api:
         params = {
             'chat_id': chat_id,
             'message_id': message_id,
-            'disable_web_page_preview': True,
+            'disable_web_page_preview': False,
             'text': message
         }
         if inline_keyboard != None:
