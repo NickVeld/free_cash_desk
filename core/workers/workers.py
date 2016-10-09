@@ -41,12 +41,12 @@ class BaseWorker(object, metaclass=WorkersList):
     def __init__(self, teleapi):
         self.tAPI = teleapi
         self.MENU_KEYBOARD = [
-            [{'text': "Поменять на", 'callback_data': StatusChanger.COMMAND}
-                , {'text': "Я ассистент и готов к приему", 'callback_data': StatusChanger.COMMAND + "_2__"}],
+            [{'text': "Пломенять на", 'callback_data': StatusChanger.COMMAND}
+                , {'text': "Я готов к приему (ассистент)", 'callback_data': StatusChanger.COMMAND + "_2__"}],
             [{'text': "Показать табличку", 'callback_data': GetTable.COMMAND}
-                , {'text': "Я ассистент и я могу быстро", 'callback_data': StatusChanger.COMMAND + '_1__'}],
+                , {'text': "Я могу быстро (ассистент)", 'callback_data': StatusChanger.COMMAND + '_1__'}],
             [{'text': "Показать мой id в telegram", 'callback_data': TgID.COMMAND}
-                , {'text': "Я ассистент и я не могу", 'callback_data': StatusChanger.COMMAND + '_0__'}],
+                , {'text': "Я не могу (ассистент)", 'callback_data': StatusChanger.COMMAND + '_0__'}],
             [{'text': "HELP!!!1!", 'callback_data': Info.COMMAND}]
         ]
 
